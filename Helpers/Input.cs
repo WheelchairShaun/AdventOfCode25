@@ -2,7 +2,7 @@
 {
 	public static class Input
 	{
-		public static string[] ReadInputFromFile(string testInput, string path = null)
+		public static string[] ReadInputFromFile(string testInput, string path = "")
 		{
 			if (File.Exists(path))
 			{
@@ -13,7 +13,7 @@
 			return lines;
 		}
 
-		public static string GetInputFromFileAsString(string testInput, string path = null)
+		public static string GetInputFromFileAsString(string testInput, string path = "")
 		{
 			if (File.Exists(path))
 			{
