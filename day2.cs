@@ -1,5 +1,6 @@
 #:project Helpers
 
+using System.Data.Common;
 using Helpers;
 
 string? puzzle = args.Length > 0 ? args[0] : "";
@@ -24,9 +25,39 @@ long invalidsSum = invalids.Select(id => new
 
 System.Console.WriteLine($"The sum of the invalid IDs is {invalidsSum}");
 
+long invalidsSum2 = invalids.Select(id => new
+			{
+				id.i,
+				id.s
+			})
+			.Where(id => IsInvalidPart2(id.i, id.s))
+			.Sum(x => x.i);
 
+System.Console.WriteLine($"The sum of the Part 2 invalid IDs is {invalidsSum2}");
 
+bool IsInvalidPart2(long id, string s)
+{
+    // Iterate through possible repeating pattern lengths
+    for (int patternLength = 1; patternLength <= s.Length / 2; patternLength++)
+    {
+        // Extract the potential repeating pattern
+        string pattern = s.Substring(0, patternLength);
 
+        // Check if the entire ID string is formed by repeating this pattern
+        // (at least twice)
+        if (s.Length % patternLength == 0) // Ensure whole repetitions
+        {
+            int repetitions = s.Length / patternLength;
+            if (repetitions >= 2 && Enumerable.Range(0, repetitions)
+                                              .All(i => s.Substring(i * patternLength, patternLength) == pattern))
+            {
+				//System.Console.WriteLine(s);
+                return true; // Found a repeating pattern
+            }
+        }
+    }
+    return false; // No repeating pattern found
+}
 
 IEnumerable<(long i, string s)> FindProductIds(string[] ranges)
 {
