@@ -38,14 +38,14 @@ System.Console.WriteLine($"The sum of the Part 2 invalid IDs is {invalidsSum2}")
 bool IsInvalidPart2(long id, string s)
 {
     // Iterate through possible repeating pattern lengths
+	// The upper bound will be half the string length
     for (int patternLength = 1; patternLength <= s.Length / 2; patternLength++)
     {
         // Extract the potential repeating pattern
         string pattern = s.Substring(0, patternLength);
 
-        // Check if the entire ID string is formed by repeating this pattern
-        // (at least twice)
-        if (s.Length % patternLength == 0) // Ensure whole repetitions
+        // Check if the entire ID string is formed by repeating this pattern at least twice
+        if (s.Length % patternLength == 0) // Make sure the string is usually divided by the current length
         {
             int repetitions = s.Length / patternLength;
             if (repetitions >= 2 && Enumerable.Range(0, repetitions)
