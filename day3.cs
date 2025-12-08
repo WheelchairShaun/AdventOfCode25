@@ -1,5 +1,6 @@
 #:project Helpers
 
+using System.Text;
 using Helpers;
 
 var data = """
@@ -20,35 +21,45 @@ var voltage = banks.Select(b => new
 
 System.Console.WriteLine(voltage);
 
-
-long FindLargestVoltage(ReadOnlySpan<char> bank)
+voltage = banks.Select(b => new
 {
-	char v1 = '0', v2 = '0';
-	int pos1 = 0;
+	v = FindLargestVoltage(b.AsSpan(), 12)
+}).Sum(b => b.v);
 
-	// Make 1 pass to find the largest voltage
-	// except the final position
-	// then capture the number
-	for (int i = 0; i < bank.Length - 1; i++)
+System.Console.WriteLine(voltage);
+
+long FindLargestVoltage(ReadOnlySpan<char> bank, int keep = 2)
+{
+	Stack<char> digits = new();
+	int drop = bank.Length - keep;
+
+	foreach (char d in bank)
 	{
-		char current = bank[i];
-		if (current > v1)
+		// While I still have drops
+		// and added the first digit to the stack
+		// peek at the last digit and see if it's less than the current digit
+		while (drop > 0 && digits.Count > 0 && digits.Peek() < d)
 		{
-			v1 = current;
-			pos1 = i;
+			// remove the last digit
+			digits.Pop();
+			drop--;
 		}
+		digits.Push(d);
 	}
 
-	// Search the rest of the array from pos1 + 1
-	for (int i = pos1 + 1; i < bank.Length; i++)
+	// If we still have drops left, remove from the end
+	while (drop > 0)
 	{
-		char current = bank[i];
-		if (current > v2)
-		{
-			v2 = current;
-		}
+		digits.Pop();
+		drop--;
 	}
 
-	// Combine those characters then return a long
-	return long.Parse(string.Concat(v1, v2));
+	// Build the result
+	var result = new char[digits.Count];
+	for (int i = digits.Count - 1; i >= 0; i--)
+	{
+		result[i] = digits.Pop();
+	}
+
+	return long.Parse(new string(result));
 }
