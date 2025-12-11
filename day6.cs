@@ -19,7 +19,7 @@ var grid = lines
 			.Select(line => line.Split((char[])null, StringSplitOptions.RemoveEmptyEntries))
 			.ToArray();
 	
-// Parse every column into an array of problems
+// Parse every column into an array of problemsIn
 int cols = grid.Max(l => l.Length);
 int rows = grid.Length - 1;
 
@@ -85,7 +85,7 @@ foreach(var problem in homework2)
 
 System.Console.WriteLine(total2);
 
-long Calculate(string problem)
+static long Calculate(string problem)
 {
 	var p = problem.Split(' ');
 
