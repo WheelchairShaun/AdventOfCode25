@@ -24,8 +24,8 @@ namespace Helpers
 		
 		public static void Print(char[,] grid)
 		{
-			int rows = grid.GetLength(0);
-			int cols = grid.GetLength(1);
+			int cols = grid.GetLength(0);
+			int rows = grid.GetLength(1);
 
 			for (int y = 0; y < rows; y++)
 			{
