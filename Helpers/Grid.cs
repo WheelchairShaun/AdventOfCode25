@@ -6,36 +6,35 @@ namespace Helpers
 	{
 		public static char[,] CreateGrid(string[] input)
 		{
-			int rows = input.Length;
-			int cols = input.FirstOrDefault()?.Length ?? 0;
+			int height = input.Length;                  // number of rows
+			int width  = input.FirstOrDefault()?.Length ?? 0; // number of columns
 
-			var grid = new char[cols, rows];
+			var grid = new char[width, height];         // [x,y] convention
 
-			for (int row = 0; row < rows; row++)
+			for (int y = 0; y < height; y++)
 			{
-				for (int col = 0; col < cols; col++)
+				for (int x = 0; x < width; x++)
 				{
-					grid[col, row] = input[row][col];
+					grid[x, y] = input[y][x];
 				}
 			}
 
 			return grid;
 		}
-		
+
 		public static void Print(char[,] grid)
 		{
-			int cols = grid.GetLength(0);
-			int rows = grid.GetLength(1);
+			int width  = grid.GetLength(0); // x dimension
+			int height = grid.GetLength(1); // y dimension
 
-			for (int y = 0; y < rows; y++)
+			for (int y = 0; y < height; y++)
 			{
-				for (int x = 0; x < cols; x++)
+				for (int x = 0; x < width; x++)
 				{
 					Console.Write(grid[x, y]);
 				}
 				Console.WriteLine(); // end of row
 			}
-
 		}
 	}
 }
