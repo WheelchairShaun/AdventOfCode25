@@ -1,7 +1,5 @@
 #:project Helpers
 
-using System.Runtime.CompilerServices;
-
 using Helpers;
 
 var data = """
@@ -27,7 +25,7 @@ string? puzzle = args.Length > 0 ? args[0] : "";
 var lines = Input.ReadInputFromFile(data, puzzle);
 
 var manifold = Grid.CreateGrid(lines);
-var quantum = Grid.CreateGrid(lines);
+
 var cols = manifold.GetLength(0);
 var rows = manifold.GetLength(1);
 
@@ -38,56 +36,72 @@ var start = Enumerable.Range(0, cols)
 					.Select(col => (X: col, Y: row, Value: manifold[col, row])))
 				.FirstOrDefault(c => c.Value == 'S');
 
-// Create first beam
+// Dictionary to track how many timelines reach each cell
+var paths = new Dictionary<(int x, int y), long>();
+
+// Initialize the first beam
+paths[(start.X, start.Y+1)] = 1L;
 manifold[start.X, start.Y+1] = '|';
 
 int splits = 0;
-
 var cr = 1;
 
-while(cr < rows)
+while (cr < rows)
 {
-	var beams = Enumerable.Range(0, cols)
-					.Where(col => manifold[col, cr] == '|')
-					.Select(col => (x: col, y: cr))
-					.ToArray();
+    var beams = Enumerable.Range(0, cols)
+        .Where(col => manifold[col, cr] == '|')
+        .Select(col => (x: col, y: cr))
+        .ToArray();
 
-	splits += TraverseBeams(beams);
-	cr++;
+    splits += TraverseBeams(beams, paths);
+    cr++;
 }
 
+Console.WriteLine($"Splits: {splits}");
+Console.WriteLine($"Timelines: {CountTimelines(paths)}");
 
-System.Console.WriteLine(splits);
 
-Grid.Print(quantum);
+// --- Methods ---
 
-int TraverseBeams((int x, int y)[] beams)
+int TraverseBeams((int x, int y)[] beams, Dictionary<(int x, int y), long> paths)
 {
-	int s = 0;
+    int s = 0;
 
-	foreach(var beam in beams)
-	{
-		if (beam.y + 1 < rows)
-		{
-			var n = manifold[beam.x, beam.y+1]; // Get the next space the beam goes to
+    foreach (var beam in beams)
+    {
+        if (beam.y + 1 < rows)
+        {
+            var n = manifold[beam.x, beam.y+1];
+            long countHere = paths[(beam.x, beam.y)];
 
-			if (n.Equals('^'))
-			{
-				// [7, 2]
-				var left = (x: beam.x-1, y: beam.y+1);
-				var right = (x: beam.x+1, y: beam.y+1);
+            if (n.Equals('^'))
+            {
+                var left = (x: beam.x-1, y: beam.y+1);
+                var right = (x: beam.x+1, y: beam.y+1);
 
-				manifold[left.x, left.y] = '|';
-				manifold[right.x, right.y] = '|';
+                manifold[left.x, left.y] = '|';
+                manifold[right.x, right.y] = '|';
 
-				s++;
-			}
-			else
-			{
-				manifold[beam.x, beam.y+1] = '|';
-			}
-		}
-	}
+                paths[left] = paths.GetValueOrDefault(left) + countHere;
+                paths[right] = paths.GetValueOrDefault(right) + countHere;
 
-	return s;
+                s++;
+            }
+            else
+            {
+                var down = (x: beam.x, y: beam.y+1);
+                manifold[down.x, down.y] = '|';
+
+                paths[down] = paths.GetValueOrDefault(down) + countHere;
+            }
+        }
+    }
+
+    return s;
+}
+
+long CountTimelines(Dictionary<(int x, int y), long> paths)
+{
+    int maxY = paths.Keys.Max(p => p.y);
+    return paths.Where(kv => kv.Key.y == maxY).Sum(kv => kv.Value);
 }
