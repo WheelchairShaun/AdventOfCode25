@@ -1,6 +1,6 @@
 namespace Helpers;
 
-public static class GeometryHelper
+public static class Geometry
 {
     /// <summary>
     /// Calculates the Euclidean distance between two 3D points.
