@@ -100,41 +100,41 @@ long Dfs(Dictionary<string, List<string>> graph, Dictionary<string, long> memory
 
 long CountPathsWithRequirements(Dictionary<string, List<string>> graph, string start, string destination)
 {
-    var memo = new Dictionary<(string node, bool dac, bool fft), long>();
-    var visiting = new HashSet<string>();
+	var memo = new Dictionary<(string node, bool dac, bool fft), long>();
+	var visiting = new HashSet<string>();
 
-    long Dfs(string node, bool visitedDac, bool visitedFft)
-    {
-        // If we reached out, check if both required nodes were visited
-        if (node == destination)
-            return (visitedDac && visitedFft) ? 1 : 0;
+	long Dfs(string node, bool visitedDac, bool visitedFft)
+	{
+		// If we reached out, check if both required nodes were visited
+		if (node == destination)
+			return (visitedDac && visitedFft) ? 1 : 0;
 
-        var key = (node, visitedDac, visitedFft);
-        if (memo.TryGetValue(key, out var cached))
-            return cached;
+		var key = (node, visitedDac, visitedFft);
+		if (memo.TryGetValue(key, out var cached))
+			return cached;
 
-        // Cycle protection
-        if (!visiting.Add(node))
-            return 0;
+		// Cycle protection
+		if (!visiting.Add(node))
+			return 0;
 
-        long total = 0;
+		long total = 0;
 
-        if (graph.TryGetValue(node, out var neighbors))
-        {
-            foreach (var next in neighbors)
-            {
-                bool nextDac = visitedDac || next == "dac";
-                bool nextFft = visitedFft || next == "fft";
+		if (graph.TryGetValue(node, out var neighbors))
+		{
+			foreach (var next in neighbors)
+			{
+				bool nextDac = visitedDac || next == "dac";
+				bool nextFft = visitedFft || next == "fft";
 
-                total += Dfs(next, nextDac, nextFft);
-            }
-        }
+				total += Dfs(next, nextDac, nextFft);
+			}
+		}
 
-        visiting.Remove(node);
-        memo[key] = total;
-        return total;
-    }
+		visiting.Remove(node);
+		memo[key] = total;
+		return total;
+	}
 
-    return Dfs(start, start == "dac", start == "fft");
+	return Dfs(start, start == "dac", start == "fft");
 }
 
