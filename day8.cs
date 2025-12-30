@@ -71,6 +71,24 @@ var circuits = junctions
 int result = circuits.Take(3).Aggregate(1, (acc, val) => acc * val);
 Console.WriteLine(result);
 
+int lastA = -1, lastB = -1;
+
+foreach (var edge in edges)
+{
+    if (uf.Union2(edge.a.id, edge.b.id))
+    {
+        lastA = edge.a.id;
+        lastB = edge.b.id;
+
+        if (uf.AllConnected())
+            break;
+    }
+}
+
+var result2 = (long)junctions[lastA].p.x * (long)junctions[lastB].p.x;
+Console.WriteLine(result2);
+
+
 record Junction(int id, (double x, double y, double z) p);
 
 record Edge(Junction a, Junction b, double distance);
@@ -80,10 +98,13 @@ class UnionFind
     private readonly int[] parent;
     private readonly int[] size;
 
+    public int Components { get; private set; }
+
     public UnionFind(int n)
     {
         parent = Enumerable.Range(0, n).ToArray();
         size = Enumerable.Repeat(1, n).ToArray();
+        Components = n;
     }
 
     public int Find(int x)
@@ -107,5 +128,23 @@ class UnionFind
         return true;
     }
 
+    public bool Union2(int a, int b)
+    {
+        int rootA = Find(a);
+        int rootB = Find(b);
+        if (rootA == rootB) return false;
+
+        if (size[rootA] < size[rootB])
+            (rootA, rootB) = (rootB, rootA);
+
+        parent[rootB] = rootA;
+        size[rootA] += size[rootB];
+
+        Components--;   // NEW: one fewer component after a successful merge
+        return true;
+    }
+
+
     public int ComponentSize(int x) => size[Find(x)];
+    public bool AllConnected() => Components == 1;
 }
